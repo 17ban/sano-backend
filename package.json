@@ -9,6 +9,8 @@
   },
   "license": "MIT",
   "private": true,
+  "homepage": "https://github.com/17ban/sano-backend",
+  "repository": "github:17ban/sano-backend",
   "scripts": {
     "start": "ts-node src/www.ts --http 8000",
     "start:dev": "ts-node src/www.ts --http 8000 --static ../sano-frontend/dist",
