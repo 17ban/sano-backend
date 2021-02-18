@@ -79,6 +79,40 @@ app.use((ctx, next) => {
 })
 
 
+app.use((ctx, next) => {
+  if(!matchRoute(ctx, 'GET', '/api/nodebundle')) {
+    return next()
+  }
+
+  //检查必要参数
+  if(!(typeof ctx.query.nid === 'string')) {
+    ctx.status = 400
+    return
+  }
+  const nid = ctx.query.nid.toUpperCase()
+
+  //检查目标是否存在
+  const targetNode = sanoNodeMap[nid]
+  if(!targetNode) {
+    ctx.status = 404
+    return
+  }
+
+  //构建响应内容
+  const resData: Record<Nid, SanoNode> = {}
+  resData[nid] = targetNode
+  const nids = targetNode.children
+  for(const _nid of nids) {
+    const node = sanoNodeMap[_nid]
+    if(node) {
+      resData[_nid] = node
+    }
+  }
+
+  //响应
+  ctx.body = resData
+})
+
 
 app.use((ctx, next) => {
   if(!matchRoute(ctx, 'POST', '/api/node')) {
