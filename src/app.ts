@@ -124,6 +124,7 @@ app.use((ctx, next) => {
   if(!(
     reqbody &&
     typeof reqbody?.content === 'string' &&
+    reqbody.content.length > 0 &&
     typeof reqbody?.parent === 'string'
   )) {
     ctx.status = 400
