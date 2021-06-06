@@ -7,7 +7,7 @@ export interface SanoNode<NID extends Nid = Nid> {
   parent: Nid,
   children: Nid[],
   time: number,
-  username?: string
+  nickname?: string
 }
 
 export type SanoNodeMap<UNION_NID extends Nid = Nid> = {

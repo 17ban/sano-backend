@@ -132,7 +132,7 @@ app.use((ctx, next) => {
   }
   const content: string = reqbody.content
   const parent: string = reqbody.parent
-  const username: string | undefined = reqbody.username
+  const nickname: string | undefined = reqbody.nickname
 
   //检查目标父节点是否存在
   const parentNode = sanoNodeMap[parent]
@@ -151,7 +151,7 @@ app.use((ctx, next) => {
     nid,
     children: [],
     time: Date.now(),
-    username
+    nickname
   }
 
   //存入
