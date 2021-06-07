@@ -146,6 +146,8 @@ app.use((ctx, next) => {
   const nid = newNid(content, parent, depth)
   const newNode: SanoNode = {
     content,
+    type: 'text',
+    index: parentNode.children.length,
     parent,
     depth,
     nid,

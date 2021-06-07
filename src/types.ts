@@ -1,15 +1,17 @@
 export type Nid = string
 
-export interface SanoNode<NID extends Nid = Nid> {
-  nid: NID,
-  depth: number,
-  content: string,
-  parent: Nid,
-  children: Nid[],
-  time: number,
+export type ContentType = 'text' | 'md'
+
+export interface SanoNode {
+  nid: Nid
+  depth: number
+  index: number
+  type: ContentType
+  content: string
+  parent: Nid
+  children: Nid[]
+  time: number
   nickname?: string
 }
 
-export type SanoNodeMap<UNION_NID extends Nid = Nid> = {
-  [NID in UNION_NID]?: SanoNode<NID>
-}
+export type SanoNodeMap = Record<string, SanoNode | undefined>
