@@ -1,4 +1,5 @@
 import {
+  ContentType,
   Nid,
   SanoNode
 } from './types'
@@ -7,6 +8,11 @@ import {
   sanoNodeMap,
   newNid
 } from './dao/sano-node'
+
+import {
+  isMarkdown,
+  markdownToHtml
+} from './utils/index'
 
 import koa, { ExtendableContext } from 'koa'
 
@@ -130,9 +136,9 @@ app.use((ctx, next) => {
     ctx.status = 400
     return
   }
-  const content: string = reqbody.content
+  let content: string = reqbody.content
   const parent: string = reqbody.parent
-  const username: string | undefined = reqbody.username
+  const nickname: string | undefined = reqbody.nickname
 
   //检查目标父节点是否存在
   const parentNode = sanoNodeMap[parent]
@@ -141,17 +147,26 @@ app.use((ctx, next) => {
     return
   }
 
+  // 检查 content 是否为 markdown 文本
+  let type: ContentType = 'text'
+  if (isMarkdown(content)) {
+    type = 'md'
+    content = markdownToHtml(content)
+  }
+
   //生成新节点
   const depth = parentNode.depth + 1
   const nid = newNid(content, parent, depth)
   const newNode: SanoNode = {
+    nid,
+    nickname,
     content,
+    type,
     parent,
     depth,
-    nid,
+    index: parentNode.children.length,
     children: [],
     time: Date.now(),
-    username
   }
 
   //存入
