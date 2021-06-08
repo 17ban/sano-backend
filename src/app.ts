@@ -1,4 +1,5 @@
 import {
+  ContentType,
   Nid,
   SanoNode
 } from './types'
@@ -141,19 +142,31 @@ app.use((ctx, next) => {
     return
   }
 
+  // 检查 content 是否为 markdown 文本
+  let type: ContentType = 'text'
+  const firstLine = content.split('\n')[0]
+  const startIndex = firstLine.indexOf('<!--')
+  const endIndex = firstLine.indexOf('-->')
+  if (startIndex > -1 && endIndex > -1) {
+    const str = firstLine.slice(startIndex + 4, endIndex).trim().toLowerCase()
+    if (str === 'md' || str === 'markdown') {
+      type = 'md'
+    }
+  }
+
   //生成新节点
   const depth = parentNode.depth + 1
   const nid = newNid(content, parent, depth)
   const newNode: SanoNode = {
+    nid,
+    nickname,
     content,
-    type: 'text',
-    index: parentNode.children.length,
+    type,
     parent,
     depth,
-    nid,
+    index: parentNode.children.length,
     children: [],
     time: Date.now(),
-    nickname
   }
 
   //存入
