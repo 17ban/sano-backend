@@ -9,6 +9,11 @@ import {
   newNid
 } from './dao/sano-node'
 
+import {
+  isMarkdown,
+  markdownToHtml
+} from './utils/index'
+
 import koa, { ExtendableContext } from 'koa'
 
 
@@ -131,7 +136,7 @@ app.use((ctx, next) => {
     ctx.status = 400
     return
   }
-  const content: string = reqbody.content
+  let content: string = reqbody.content
   const parent: string = reqbody.parent
   const nickname: string | undefined = reqbody.nickname
 
@@ -144,14 +149,9 @@ app.use((ctx, next) => {
 
   // 检查 content 是否为 markdown 文本
   let type: ContentType = 'text'
-  const firstLine = content.split('\n')[0]
-  const startIndex = firstLine.indexOf('<!--')
-  const endIndex = firstLine.indexOf('-->')
-  if (startIndex > -1 && endIndex > -1) {
-    const str = firstLine.slice(startIndex + 4, endIndex).trim().toLowerCase()
-    if (str === 'md' || str === 'markdown') {
-      type = 'md'
-    }
+  if (isMarkdown(content)) {
+    type = 'md'
+    content = markdownToHtml(content)
   }
 
   //生成新节点
