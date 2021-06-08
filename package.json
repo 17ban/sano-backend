@@ -12,9 +12,8 @@
   "homepage": "https://github.com/17ban/sano-backend",
   "repository": "github:17ban/sano-backend",
   "scripts": {
-    "start": "ts-node src/www.ts --http 8000",
-    "start:dev": "ts-node src/www.ts --http 8000 --static ../sano-frontend/dist",
-    "nohup": "nohup ts-node src/www.ts --http 8000 &"
+    "run:prod": "ts-node src/www.ts",
+    "run:dev": "ts-node src/www.ts --http 8000 --static ../sano-frontend/dist"
   },
   "dependencies": {
     "base32-encode": "^1.1.1",
