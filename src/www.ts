@@ -1,11 +1,9 @@
 import http2 from 'http2'
 import http from 'http'
 import fs from 'fs'
-import koaStatic from 'koa-static'
 
 import cfg from './cfg'
 import app from './app'
-
 
 // 处理启动参数
 let httpPort = process.env.HTTP_PORT
@@ -21,9 +19,6 @@ for(let i = 0; i < args.length; i++) {
     if(!isNaN(Number(args[i + 1]))) {
       httpsPort = args[++i]
     }
-  } else if(arg === '--static') {
-    const staticPath = args[++i]
-    app.use(koaStatic(staticPath))
   }
 }
 
