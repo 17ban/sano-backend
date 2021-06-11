@@ -12,8 +12,8 @@
   "homepage": "https://github.com/17ban/sano-backend",
   "repository": "github:17ban/sano-backend",
   "scripts": {
-    "run:prod": "ts-node src/www.ts",
-    "run:dev": "ts-node src/www.ts --http 8000 --static ../sano-frontend/dist"
+    "prod": "cross-env NODE_ENV=production HTTP_PORT=8020 ts-node src/www.ts",
+    "dev": "cross-env NODE_ENV=development HTTP_PORT=8000 ts-node src/www.ts"
   },
   "dependencies": {
     "base32-encode": "^1.1.1",
@@ -33,6 +33,7 @@
     "@types/koa": "^2.11.8",
     "@types/koa-static": "^4.0.1",
     "@types/marked": "^2.0.3",
+    "cross-env": "^7.0.3",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.5"
   }

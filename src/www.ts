@@ -8,8 +8,9 @@ import app from './app'
 
 
 // 处理启动参数
-let httpPort, httpsPort = null
-let args = process.argv.splice(2)
+let httpPort = process.env.HTTP_PORT
+let httpsPort = process.env.HTTPS_PORT
+const args = process.argv.slice(2)
 for(let i = 0; i < args.length; i++) {
   let arg = args[i]
   if(arg === '--http') {
@@ -25,7 +26,6 @@ for(let i = 0; i < args.length; i++) {
     app.use(koaStatic(staticPath))
   }
 }
-
 
 // 启动 https 服务
 if(httpsPort) {
