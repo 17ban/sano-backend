@@ -1,7 +1,8 @@
-import {
-  ContentType,
-  Nid,
-  SanoNode
+import type {
+  SanoNodeContentType,
+  SanoNid,
+  SanoNode,
+  SanoNodeBundle
 } from './types'
 
 import {
@@ -69,19 +70,17 @@ app.use((ctx, next) => {
   }
 
   //构建响应内容
-  const resData: Record<Nid, SanoNode> = {}
   const nids = ctx.query.nids
     .split(',')
     .map(nid => nid.toUpperCase())
+  const nodes = []  
   for(const nid of nids) {
     const node = sanoNodeMap[nid]
-    if(node) {
-      resData[nid] = node
-    }
+    if(node) nodes.push(node)
   }
 
   //响应
-  ctx.body = resData
+  ctx.body = nodes
 })
 
 
@@ -98,22 +97,19 @@ app.use((ctx, next) => {
   const nid = ctx.query.nid.toUpperCase()
 
   //检查目标是否存在
-  const targetNode = sanoNodeMap[nid]
-  if(!targetNode) {
+  const mainNode = sanoNodeMap[nid]
+  if(!mainNode) {
     ctx.status = 404
     return
   }
 
   //构建响应内容
-  const resData: Record<Nid, SanoNode> = {}
-  resData[nid] = targetNode
-  const nids = targetNode.children
-  for(const _nid of nids) {
-    const node = sanoNodeMap[_nid]
-    if(node) {
-      resData[_nid] = node
-    }
+  const childNodes = []
+  for(const nid of mainNode.children) {
+    const childNode = sanoNodeMap[nid]
+    if(childNode) childNodes.push(childNode)
   }
+  const resData: SanoNodeBundle = { mainNode, childNodes }
 
   //响应
   ctx.body = resData
@@ -148,7 +144,7 @@ app.use((ctx, next) => {
   }
 
   // 检查 content 是否为 markdown 文本
-  let type: ContentType = 'text'
+  let type: SanoNodeContentType = 'text'
   if (isMarkdown(content)) {
     type = 'md'
     content = markdownToHtml(content)

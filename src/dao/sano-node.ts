@@ -1,5 +1,5 @@
 import {
-  Nid,
+  SanoNid,
   SanoNode
 } from '../types'
 
@@ -30,8 +30,8 @@ setInterval(() => {
   }
 }, _updateDelay)
 
-export const sanoNodeMap: Record<Nid, SanoNode | undefined> = 
-  new Proxy(_nodesMap as Record<Nid, SanoNode>, {
+export const sanoNodeMap: Record<SanoNid, SanoNode | undefined> = 
+  new Proxy(_nodesMap as Record<SanoNid, SanoNode>, {
     get(target, property, receiver) {
       return target[<string>property]
     },
@@ -53,7 +53,7 @@ function hash(str: string): string {
 }
 
 
-export function newNid(content: string, parent: Nid, depth: number): string {
+export function newNid(content: string, parent: SanoNid, depth: number): string {
   //生成 nid
   const nid = hash(content + parent + Date.now())
     .slice(8, depth > 1 ? 16 : 12)
