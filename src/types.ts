@@ -16,7 +16,7 @@ export type SanoNode<NID extends SanoNid = SanoNid> = {
 
 export type SanoNodeRecord = Record<string, SanoNode | undefined>
 
-export type SanoNodeBundle = {
-  mainNode: SanoNode
+export type SanoNodeBundle<NID extends SanoNid = SanoNid> = {
+  mainNode: SanoNode<NID>
   childNodes: SanoNode[]
 }

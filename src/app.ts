@@ -1,189 +1,122 @@
-import type {
-  SanoNodeContentType,
-  SanoNode,
-  SanoNodeBundle
-} from './types'
-
 import {
-  sanoNodeRecord,
-  newNid,
-  getStickyNids
+  getNode,
+  getNodes,
+  getNodebundle,
+  getStickyNids,
+  newNode
 } from './dao/sano-node'
 
-import {
-  isMarkdown,
-  markdownToHtml
-} from './utils/index'
-
 import koa, { ExtendableContext } from 'koa'
+import koaBody from 'koa-body'
 
-
+const app = new koa()
+app.use(koaBody())
 
 function matchRoute(ctx: ExtendableContext, method: string, path: string) {
   return (ctx.method === method && ctx.path === path)
 }
 
-
-//实例化 koa app
-const app = new koa()
-
-
-//解析请求的 body
-import koaBody from 'koa-body'
-app.use(koaBody())
-
-
-
+/**
+ * GET /api/node
+ */
 app.use((ctx, next) => {
   if(!matchRoute(ctx, 'GET', '/api/node')) {
     return next()
   }
-
-  //检查必要参数
+  // check params
   if(!(typeof ctx.query.nid === 'string')) {
     ctx.status = 400
     return
   }
+  // response
   const nid = ctx.query.nid.toUpperCase()
-
-  //检查目标 node 是否存在
-  if(!sanoNodeRecord[nid]) {
+  const node = getNode(nid)
+  if(!node) {
     ctx.status = 404
     return
   }
-
-  //响应
-  ctx.body = sanoNodeRecord[nid]
+  ctx.body = node
 })
 
-
-
+/**
+ * GET /api/nodes
+ */
 app.use((ctx, next) => {
   if(!matchRoute(ctx, 'GET', '/api/nodes')) {
     return next()
   }
-
-  //检查必要参数
+  // check params
   if(!(typeof ctx.query.nids === 'string')) {
     ctx.status = 400
     return
   }
-
-  //构建响应内容
+  // response
   const nids = ctx.query.nids
     .split(',')
     .map(nid => nid.toUpperCase())
-  const nodes = []  
-  for(const nid of nids) {
-    const node = sanoNodeRecord[nid]
-    if(node) nodes.push(node)
-  }
-
-  //响应
+  const nodes = getNodes(nids)
   ctx.body = nodes
 })
 
+/**
+ * GET /api/sticky-nids
+ */
 app.use((ctx, next) => {
   if(!matchRoute(ctx, 'GET', '/api/sticky-nids')) {
     return next()
   }
-
-  //构建响应内容
-  const nodes = getStickyNids()
-
-  //响应
-  ctx.body = nodes
+  // response
+  ctx.body = getStickyNids()
 })
 
+/**
+ * GET /api/nodebundle
+ */
 app.use((ctx, next) => {
   if(!matchRoute(ctx, 'GET', '/api/nodebundle')) {
     return next()
   }
-
-  //检查必要参数
+  // check params
   if(!(typeof ctx.query.nid === 'string')) {
     ctx.status = 400
     return
   }
+  // response
   const nid = ctx.query.nid.toUpperCase()
-
-  //检查目标是否存在
-  const mainNode = sanoNodeRecord[nid]
-  if(!mainNode) {
+  const nodebundle = getNodebundle(nid)
+  if (!nodebundle) {
     ctx.status = 404
     return
   }
-
-  //构建响应内容
-  const childNodes = []
-  for(const nid of mainNode.children) {
-    const childNode = sanoNodeRecord[nid]
-    if(childNode) childNodes.push(childNode)
-  }
-  const resData: SanoNodeBundle = { mainNode, childNodes }
-
-  //响应
-  ctx.body = resData
+  ctx.body = nodebundle
 })
 
-
+/**
+ * POST /api/node
+ */
 app.use((ctx, next) => {
   if(!matchRoute(ctx, 'POST', '/api/node')) {
     return next()
   }
-
-  //检查必要参数
-  const reqbody = ctx.request?.body
-  if(!(
-    reqbody &&
-    typeof reqbody?.content === 'string' &&
-    reqbody.content.length > 0 &&
-    typeof reqbody?.parent === 'string'
-  )) {
+  // check params
+  const reqbody: Record<string, string | undefined> = ctx.request.body
+  if (!(reqbody instanceof Object)) {
+    ctx.status = 500
+    return
+  }
+  const { content, parent, nickname } = reqbody
+  if(!(content && parent)) {
     ctx.status = 400
     return
   }
-  let content: string = reqbody.content
-  const parent: string = reqbody.parent
-  const nickname: string | undefined = reqbody.nickname
-
-  //检查目标父节点是否存在
-  const parentNode = sanoNodeRecord[parent]
-  if(!parentNode) {
+  // response
+  const nid = newNode(parent, content, nickname)
+  if (!nid) {
     ctx.status = 406
     return
   }
-
-  // 检查 content 是否为 markdown 文本
-  let type: SanoNodeContentType = 'text'
-  if (isMarkdown(content)) {
-    type = 'md'
-    content = markdownToHtml(content)
-  }
-
-  //生成新节点
-  const depth = parentNode.depth + 1
-  const nid = newNid(content, parent, depth)
-  const newNode: SanoNode = {
-    nid,
-    nickname,
-    content,
-    type,
-    parent,
-    depth,
-    index: parentNode.children.length,
-    children: [],
-    time: Date.now(),
-  }
-
-  //存入
-  parentNode.children.push(nid)
-  sanoNodeRecord[nid] = newNode
-
   //响应
-  ctx.body = {
-    nid
-  }
+  ctx.body = { nid }
 })
 
 export default app

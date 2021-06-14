@@ -1,13 +1,19 @@
-import {
-  SanoNid,
-  SanoNode,
-  SanoNodeRecord
-} from '../types'
-
 import CryptoJS from 'crypto-js'
 import base32Encode from 'base32-encode'
 import fs from 'fs'
 
+import {
+  isMarkdown,
+  markdownToHtml
+} from '../utils/index'
+
+import {
+  SanoNid,
+  SanoNode,
+  SanoNodeRecord,
+  SanoNodeContentType,
+  SanoNodeBundle
+} from '../types'
 
 
 const _nodesRecord = JSON.parse(fs.readFileSync('./data/nodes.json', 'utf-8'))
@@ -64,6 +70,61 @@ export function newNid(content: string, parent: SanoNid, depth: number): string 
   } else {
     return nid
   }
+}
+
+export function getNode<NID extends SanoNid>(nid: NID): SanoNode<NID> | undefined {
+  return sanoNodeRecord[nid] as SanoNode<NID> | undefined
+}
+
+export function getNodes<NID extends SanoNid>(nids: NID[]): SanoNode<NID>[] {
+  const nodes = []
+  for (const nid of nids) {
+    const node = getNode(nid)
+    if (node) nodes.push(node)
+  }
+  return nodes
+}
+
+export function getNodebundle<NID extends SanoNid>(nid: NID): SanoNodeBundle<NID> | undefined {
+  const mainNode = getNode(nid)
+  if(!mainNode) return undefined
+  const childNodes = getNodes(mainNode.children)
+  return { mainNode, childNodes }
+}
+
+export function newNode(parent: SanoNid, content: string, nickname?: string): SanoNid | false {
+  // check parent node
+  const parentNode = getNode(parent)
+  if(!parentNode) return false
+
+  // check whether the content is a markdown text
+  let type: SanoNodeContentType = 'text'
+  if (isMarkdown(content)) {
+    type = 'md'
+    content = markdownToHtml(content)
+  }
+
+  // create new node
+  const depth = parentNode.depth + 1
+  const nid = newNid(content, parent, depth)
+  const newNode: SanoNode = {
+    nid,
+    nickname,
+    content,
+    type,
+    parent,
+    depth,
+    index: parentNode.children.length,
+    children: [],
+    time: Date.now(),
+  }
+
+  // save the new node
+  parentNode.children.push(nid)
+  sanoNodeRecord[nid] = newNode
+
+  // return the nid of new node
+  return nid
 }
 
 const stickyNids = JSON.parse(fs.readFileSync('./data/sticky-nids.json', 'utf-8'))
