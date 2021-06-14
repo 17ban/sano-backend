@@ -6,7 +6,8 @@ import type {
 
 import {
   sanoNodeRecord,
-  newNid
+  newNid,
+  getStickyNids
 } from './dao/sano-node'
 
 import {
@@ -82,6 +83,17 @@ app.use((ctx, next) => {
   ctx.body = nodes
 })
 
+app.use((ctx, next) => {
+  if(!matchRoute(ctx, 'GET', '/api/sticky-nids')) {
+    return next()
+  }
+
+  //构建响应内容
+  const nodes = getStickyNids()
+
+  //响应
+  ctx.body = nodes
+})
 
 app.use((ctx, next) => {
   if(!matchRoute(ctx, 'GET', '/api/nodebundle')) {

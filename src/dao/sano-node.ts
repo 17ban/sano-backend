@@ -65,3 +65,8 @@ export function newNid(content: string, parent: SanoNid, depth: number): string 
     return nid
   }
 }
+
+const stickyNids = JSON.parse(fs.readFileSync('./data/sticky-nids.json', 'utf-8'))
+export function getStickyNids() {
+  return stickyNids
+}
