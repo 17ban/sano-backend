@@ -1,6 +1,7 @@
 import {
   SanoNid,
-  SanoNode
+  SanoNode,
+  SanoNodeRecord
 } from '../types'
 
 import CryptoJS from 'crypto-js'
@@ -9,8 +10,8 @@ import fs from 'fs'
 
 
 
-const _nodesMap = JSON.parse(fs.readFileSync('./data/nodes.json', 'utf-8'))
-if(typeof _nodesMap !== 'object') {
+const _nodesRecord = JSON.parse(fs.readFileSync('./data/nodes.json', 'utf-8'))
+if(typeof _nodesRecord !== 'object') {
   throw new Error(`Can't read nodes.json.`)
 }
 
@@ -23,15 +24,15 @@ setInterval(() => {
     if(_updateFlag) {
       _hasUpdate = false
       _updateFlag = false
-      fs.writeFileSync('./data/nodes.json', JSON.stringify(_nodesMap, undefined, 2))
+      fs.writeFileSync('./data/nodes.json', JSON.stringify(_nodesRecord, undefined, 2))
     } else {
       _updateFlag = true
     }
   }
 }, _updateDelay)
 
-export const sanoNodeMap: Record<SanoNid, SanoNode | undefined> = 
-  new Proxy(_nodesMap as Record<SanoNid, SanoNode>, {
+export const sanoNodeRecord: SanoNodeRecord = 
+  new Proxy(_nodesRecord as Record<SanoNid, SanoNode>, {
     get(target, property, receiver) {
       return target[<string>property]
     },
@@ -58,7 +59,7 @@ export function newNid(content: string, parent: SanoNid, depth: number): string 
   const nid = hash(content + parent + Date.now())
     .slice(8, depth > 1 ? 16 : 12)
   //防止 id 重复
-  if(sanoNodeMap[nid]) {
+  if(sanoNodeRecord[nid]) {
     return newNid(content + nid, parent, depth)
   } else {
     return nid

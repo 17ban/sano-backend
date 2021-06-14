@@ -2,8 +2,8 @@ export type SanoNid = string
 
 export type SanoNodeContentType = 'text' | 'md'
 
-export interface SanoNode {
-  nid: SanoNid
+export type SanoNode<NID extends SanoNid = SanoNid> = {
+  nid: NID
   depth: number
   index: number
   type: SanoNodeContentType
@@ -14,7 +14,7 @@ export interface SanoNode {
   nickname?: string
 }
 
-export type SanoNodeMap = Record<string, SanoNode | undefined>
+export type SanoNodeRecord = Record<string, SanoNode | undefined>
 
 export type SanoNodeBundle = {
   mainNode: SanoNode

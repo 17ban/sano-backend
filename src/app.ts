@@ -1,12 +1,11 @@
 import type {
   SanoNodeContentType,
-  SanoNid,
   SanoNode,
   SanoNodeBundle
 } from './types'
 
 import {
-  sanoNodeMap,
+  sanoNodeRecord,
   newNid
 } from './dao/sano-node'
 
@@ -47,13 +46,13 @@ app.use((ctx, next) => {
   const nid = ctx.query.nid.toUpperCase()
 
   //检查目标 node 是否存在
-  if(!sanoNodeMap[nid]) {
+  if(!sanoNodeRecord[nid]) {
     ctx.status = 404
     return
   }
 
   //响应
-  ctx.body = sanoNodeMap[nid]
+  ctx.body = sanoNodeRecord[nid]
 })
 
 
@@ -75,7 +74,7 @@ app.use((ctx, next) => {
     .map(nid => nid.toUpperCase())
   const nodes = []  
   for(const nid of nids) {
-    const node = sanoNodeMap[nid]
+    const node = sanoNodeRecord[nid]
     if(node) nodes.push(node)
   }
 
@@ -97,7 +96,7 @@ app.use((ctx, next) => {
   const nid = ctx.query.nid.toUpperCase()
 
   //检查目标是否存在
-  const mainNode = sanoNodeMap[nid]
+  const mainNode = sanoNodeRecord[nid]
   if(!mainNode) {
     ctx.status = 404
     return
@@ -106,7 +105,7 @@ app.use((ctx, next) => {
   //构建响应内容
   const childNodes = []
   for(const nid of mainNode.children) {
-    const childNode = sanoNodeMap[nid]
+    const childNode = sanoNodeRecord[nid]
     if(childNode) childNodes.push(childNode)
   }
   const resData: SanoNodeBundle = { mainNode, childNodes }
@@ -137,7 +136,7 @@ app.use((ctx, next) => {
   const nickname: string | undefined = reqbody.nickname
 
   //检查目标父节点是否存在
-  const parentNode = sanoNodeMap[parent]
+  const parentNode = sanoNodeRecord[parent]
   if(!parentNode) {
     ctx.status = 406
     return
@@ -167,7 +166,7 @@ app.use((ctx, next) => {
 
   //存入
   parentNode.children.push(nid)
-  sanoNodeMap[nid] = newNode
+  sanoNodeRecord[nid] = newNode
 
   //响应
   ctx.body = {
