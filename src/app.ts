@@ -17,10 +17,10 @@ function matchRoute(ctx: ExtendableContext, method: string, path: string) {
 }
 
 /**
- * GET /api/node
+ * GET /node
  */
 app.use((ctx, next) => {
-  if(!matchRoute(ctx, 'GET', '/api/node')) {
+  if(!matchRoute(ctx, 'GET', '/node')) {
     return next()
   }
   // check params
@@ -39,10 +39,10 @@ app.use((ctx, next) => {
 })
 
 /**
- * GET /api/nodes
+ * GET /nodes
  */
 app.use((ctx, next) => {
-  if(!matchRoute(ctx, 'GET', '/api/nodes')) {
+  if(!matchRoute(ctx, 'GET', '/nodes')) {
     return next()
   }
   // check params
@@ -59,10 +59,10 @@ app.use((ctx, next) => {
 })
 
 /**
- * GET /api/sticky-nids
+ * GET /sticky-nids
  */
 app.use((ctx, next) => {
-  if(!matchRoute(ctx, 'GET', '/api/sticky-nids')) {
+  if(!matchRoute(ctx, 'GET', '/sticky-nids')) {
     return next()
   }
   // response
@@ -70,10 +70,10 @@ app.use((ctx, next) => {
 })
 
 /**
- * GET /api/nodebundle
+ * GET /nodebundle
  */
 app.use((ctx, next) => {
-  if(!matchRoute(ctx, 'GET', '/api/nodebundle')) {
+  if(!matchRoute(ctx, 'GET', '/nodebundle')) {
     return next()
   }
   // check params
@@ -92,10 +92,10 @@ app.use((ctx, next) => {
 })
 
 /**
- * POST /api/node
+ * POST /node
  */
 app.use((ctx, next) => {
-  if(!matchRoute(ctx, 'POST', '/api/node')) {
+  if(!matchRoute(ctx, 'POST', '/node')) {
     return next()
   }
   // check params
