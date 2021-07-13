@@ -8,8 +8,10 @@ import {
 
 import koa, { ExtendableContext } from 'koa'
 import koaBody from 'koa-body'
+import cors from '@koa/cors'
 
 const app = new koa()
+app.use(cors())
 app.use(koaBody())
 
 function matchRoute(ctx: ExtendableContext, method: string, path: string) {
